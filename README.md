@@ -1,2 +1,3 @@
-# network_meta-analysis
+# Network Meta-Analysis
+
 Network meta-analysis project.
