@@ -1,1 +1,0 @@
-pandoc manuscript.md -o manuscript.docx --reference-doc=template.docx
