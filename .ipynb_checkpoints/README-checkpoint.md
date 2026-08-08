@@ -4,25 +4,32 @@
 
 
 
-<p align = "center">
+<div align = "center">
 Jagiellonian University<br>
 Medical College<br>
-Doctoral School of Medical and Health Sciences</p>
-
+Doctoral School of Medical and Health Sciences<br>
+</div>
+</br>
 <div  align="center" ><a href="https://github.com/d-wkim/phd"><img alt = "" src="https://raw.githubusercontent.com/d-wkim/assets/refs/heads/main/icons/uj_black.jpg" width="100" height="150"></a></div>
 
+<hr>
+
 <h2 align="center">
-Comparative analysis of outcome measures using the most commonly used graft harvesting sources in primary anterior cruciate ligament reconstruction surgery.<br>
+Comparative analysis of outcome measures using the most common grafts<br>
+for primary anterior cruciate ligament reconstruction surgery.<br>
 A systematic review and network meta-analysis
 </h2>
-<p align = "center">
-<sub>A dissertation submitted in partial fulfillment of the requirements for the award of the degree of:</sub><br><br>
+
+<hr> 
+
+<div align = "center">
+A dissertation submitted in partial fulfillment of the requirements for the award of the degree of:<br><br>
 Doctor of Philosophy (Ph.D.)<br><br>
 <sup>submitted by:</sup><br>
 <strong>Dong Woon Kim</strong>, M.D.<br><br>
 <sup>supervised by:</sup><br>
-Konrad Malinowski, M.D. Ph.D.</strong>
-</p>
+Konrad Malinowski, M.D. Ph.D.<br>
+<br<br>Kraków, 2026
 
 ---
 
@@ -36,3 +43,7 @@ Konrad Malinowski, M.D. Ph.D.</strong>
 
 **Eligibility criteria**: Randomized controlled trials that compared the outcomes of at least two of the six grafts adult patients for primary anterior cruciate ligament reconstruction surgery were considered for inclusion. Furthermore, only those that reported on the most directly comparable outcomes were included in the analyses.
 
+
+```python
+
+```
