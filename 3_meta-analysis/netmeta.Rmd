@@ -10,11 +10,7 @@ output:
 
 ```{r setup}
 
-#setwd("G:/My Drive/github/d-wkim/network_meta-analysis/")
-#getwd()
-
-#install.packages('IRkernel')
-#install.packages("netmeta")
+setwd("G:/My Drive/github/d-wkim/network_meta-analysis/")
 
 packages <- c(
   "googledrive",
@@ -30,20 +26,90 @@ packages <- c(
   "ggplot2",
   "tidyverse",
   "devtools",
-  "netmeta"
+  "netmeta",
+  "rgl"
 )
 
-#install.packages(packages, dependencies = TRUE)
+
+# install.packages(packages, dependencies = TRUE)
+
 devtools::install_github("NightingaleHealth/ggforestplot")
-
 lapply(packages, library, character.only = TRUE)
+```
 
+```{r}
+
+# Custom R function for running network meta-analysis 
+
+network_meta_analysis <- function(df) {
+  
+  data_path <- paste0("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/",df, ".csv")
+  data <- read_csv(data_path)
+  
+  m.netmeta <- netmeta(
+		TE = smd, 
+		seTE = se,
+		treat1 = treat1,
+		treat2 = treat2,
+		studlab = study,
+		data = data,
+		sm = "SMD",
+		common = FALSE, 
+		random = TRUE,
+		reference.group = "BPTB",
+		details.chkmultiarm = TRUE,
+		sep.trts = " vs "
+	)
+
+	txt = paste0("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/", df, ".txt")
+
+	# Print and save network meta-analysis results
+	
+	sink(file = txt)
+	print(m.netmeta)
+
+	labels = m.netmeta$trts
+	
+	long.labels = c("Bone-patellar tendon-bone", "Hamstring", "Peroneus longus", "Quadriceps", "Tibialis anterior")
+	svg = paste0("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/", df, ".svg")
+	svg(file = svg, height = 5, width = 5)
+
+	network_graph = netgraph(m.netmeta, labels = labels, dim = "2d", scale = 1.1)
+	print(network_graph)
+	dev.off()
+	
+  return(m.netmeta)	
+	
+}
 
 ```
 
+```{r}
+
+df = c("ikdc_subjective", 
+       "lysholm", 
+       "tegner", 
+       "instrumented_laxity", 
+       "pivot_shift_1", 
+       "pivot_shift_2", 
+       "lachman_1", 
+       "lachman_2", 
+       "graft_failure"
+       )
+
+
+lapply(df, network_meta_analysis)
+
+ikdc_subjective <- network_meta_analysis("ikdc_subjective")
+lysholm <- network_meta_analysis("lysholm")
+
+```
+
+
+
 ```{r ikdc_subjective}
 
-ikdc_subjective <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/ikdc_subjective.csv")
+ikdc_subjective <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/ikdc_subjective.csv")
 
 m.netmeta <- netmeta(
   TE = smd,
@@ -60,16 +126,23 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/ikdc_subjective.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/ikdc_subjective.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
 long.labels = c("Bone-patellar tendon-bone", "Hamstring", "Peroneus longus", "Quadriceps", "Tibialis anterior")
-netgraph(m.netmeta, labels = labels)
 
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/ikdc_subjective.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+dev.off()
 # forest plots for network meta-analysis
 
-#svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/continuous/ikdc_subjective.svg", width = 9, height = 10)
+#svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/continuous/ikdc_subjective.svg", width = 9, height = 10)
+print(network_graph)
 
 forest(m.netmeta,
        reference.group = "BPTB",
@@ -78,12 +151,10 @@ forest(m.netmeta,
        smlab = paste("BPTB vs other grafts \n",
                      "(IKDC subjective)"),
        drop.reference.group = TRUE,
-       label.left = "Favors BPTB",
-       label.right = "Favors HT",
        labels = long.labels)
 
 #dev.off()
-svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/ikdc_subjective.svg", height = 10, width = 10)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/lattice/ikdc_subjective.svg", height = 10, width = 10)
 lattice <- netsplit(m.netmeta) %>% forest() 
 print(lattice)
 dev.off()
@@ -92,7 +163,7 @@ dev.off()
 
 ```{r lysholm}
 
-lysholm <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/lysholm.csv")
+lysholm <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/lysholm.csv")
 
 m.netmeta <- netmeta(
   TE = smd,
@@ -109,11 +180,17 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/lysholm.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/lysholm.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
-netgraph(m.netmeta, labels = labels)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/lysholm.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+dev.off()
 
 svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/lysholm.svg", height = 10, width = 10)
 lattice <- netsplit(m.netmeta) %>% forest() 
@@ -123,7 +200,7 @@ dev.off()
 
 ```{r tegner}
 
-tegner <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/tegner.csv")
+tegner <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/tegner.csv")
 
 m.netmeta <- netmeta(
   TE = smd,
@@ -140,14 +217,20 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/tegner.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/tegner.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
 #install.packages("rgl")
 
 # Network graph
-netgraph(m.netmeta, labels = labels)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/tegner.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+dev.off()
 
 svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/tegner.svg", height = 10, width = 10)
 lattice <- netsplit(m.netmeta) %>% forest() 
@@ -157,7 +240,7 @@ dev.off()
 ```
 
 ```{r instrumented_laxity}
-instrumented_laxity <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/instrumented_laxity.csv")
+instrumented_laxity <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/instrumented_laxity.csv")
 
 instrumented_laxity <- na.omit(instrumented_laxity)
 
@@ -176,15 +259,21 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/instrumented_laxity.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/instrumented_laxity.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
 #install.packages("rgl")
 
 # Network graph
-netgraph(m.netmeta, labels = labels)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/instrumented_laxity.svg", height = 5, width = 5)
 
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+
+dev.off()
 # Forest plot
 svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/instrumented_laxity.svg", height = 10, width = 10)
 lattice <- netsplit(m.netmeta) %>% forest() 
@@ -194,7 +283,7 @@ dev.off()
 
 ```{r pivot_shift_1}
 
-pivot_shift_1 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/pivot_shift_1_analysis.csv")
+pivot_shift_1 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/pivot_shift_1.csv")
 
 pivot_shift_1 <- na.omit(pivot_shift_1)
 
@@ -213,14 +302,21 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/pivot_shift_1.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/pivot_shift_1.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
 #install.packages("rgl")
 
-netgraph(m.netmeta, labels = labels)
-svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/pivot_shift_1.svg", height = 10, width = 10)
+
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/pivot_shift_1.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+dev.off()
+
 lattice <- netsplit(m.netmeta) %>% forest() 
 print(lattice)
 dev.off()
@@ -228,8 +324,7 @@ dev.off()
 
 ```{r pivot_shift_2}
 
-pivot_shift_2 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/pivot_shift_2_analysis.csv")
-
+pivot_shift_2 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/pivot_shift_2.csv")
 pivot_shift_2 <- na.omit(pivot_shift_2)
 
 m.netmeta <- netmeta(
@@ -247,14 +342,21 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/pivot_shift_2.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/pivot_shift_2.txt")
 print(m.netmeta)
+sink()
 
 labels = m.netmeta$trts
 #install.packages("rgl")
 
-netgraph(m.netmeta, labels = labels)
-svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/pivot_shift_2.svg", height = 10, width = 10)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/pivot_shift_2.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+dev.off()
+
 lattice <- netsplit(m.netmeta) %>% forest() 
 print(lattice)
 dev.off()
@@ -264,8 +366,7 @@ dev.off()
 
 ```{r lachman_1}
 
-lachman_1 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/lachman_1_analysis.csv")
-
+lachman_1 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/lachman_1.csv")
 lachman_1 <- na.omit(lachman_1)
 
 m.netmeta <- netmeta(
@@ -283,13 +384,21 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/lachman_1.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/lachman_1.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
 #install.packages("rgl")
 
-netgraph(m.netmeta, labels = labels)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/lachman_1.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+
+print(network_graph)
+dev.off()
+
 svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/lachman_1.svg", height = 10, width = 10)
 lattice <- netsplit(m.netmeta) %>% forest() 
 print(lattice)
@@ -300,7 +409,7 @@ dev.off()
 
 ```{r lachman_2}
 
-lachman_2 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/lachman_2_analysis.csv")
+lachman_2 <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/lachman_2.csv")
 
 lachman_2 <- na.omit(lachman_2)
 
@@ -319,13 +428,20 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/lachman_2.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/lachman_2.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
 #install.packages("rgl")
 
-netgraph(m.netmeta, labels = labels)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/lachman_2.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+dev.off()
+
 svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/lachman_2.svg", height = 10, width = 10)
 lattice <- netsplit(m.netmeta) %>% forest() 
 print(lattice)
@@ -334,7 +450,7 @@ dev.off()
 
 ```{r graft_failure}
 
-graft_failure <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/graft_failure_analysis.csv")
+graft_failure <- read_csv("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/sheets_for_analysis/graft_failure_analysis.csv")
 
 graft_failure <- na.omit(graft_failure)
 
@@ -353,19 +469,30 @@ m.netmeta <- netmeta(
   sep.trts = " vs "
 )
 
-#sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/analysis/sheets_for_analysis/graft_failure.txt")
+sink(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/results/graft_failure.txt")
 print(m.netmeta)
 
 labels = m.netmeta$trts
 #install.packages("rgl")
 
-netgraph(m.netmeta, labels = labels)
+svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/plots/network_graph/graft_failure.svg", height = 5, width = 5)
+
+network_graph = netgraph(m.netmeta, labels = labels,
+         dim = "2d",
+         scale = 1.1)
+print(network_graph)
+dev.off()
 
 svg(file = "G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/plots/lattice/graft_failure.svg", height = 10, width = 10)
 lattice <- netsplit(m.netmeta) %>% forest() 
 print(lattice)
 dev.off()
-```
+
 
 ```
 
+```{r}
+
+
+
+```
