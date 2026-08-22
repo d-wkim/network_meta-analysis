@@ -5,17 +5,28 @@ Number of designs: d = 2
 
 Random effects model
 
-Treatment estimate (other treatments vs 'BPTB'):
-         SMD            95% CI     z p-value
-BPTB       .                 .     .       .
-HT   -0.0983 [-0.1986; 0.0020] -1.92  0.0547
-QT   -0.2553 [-0.7382; 0.2276] -1.04  0.3001
+Treatment estimate (sm = 'OR'):
+       BPTB     HT     QT
+BPTB      . 1.1033 1.2908
+HT   0.9064      . 1.1700
+QT   0.7747 0.8547      .
+
+Lower 95%-confidence limit:
+       BPTB     HT     QT
+BPTB      . 0.9980 0.7964
+HT   0.8199      . 0.7295
+QT   0.4780 0.5329      .
+
+Upper 95%-confidence limit:
+       BPTB     HT     QT
+BPTB      . 1.2196 2.0921
+HT   1.0020      . 1.8764
+QT   1.2556 1.3707      .
 
 Quantifying heterogeneity / inconsistency:
 tau^2 = 0; tau = 0; I^2 = 0% [0.0%; 60.2%]
 
-Tests of heterogeneity (within designs) and inconsistency
-(between designs):
+Tests of heterogeneity (within designs) and inconsistency (between designs):
                    Q d.f. p-value
 Total           4.09   10  0.9431
 Within designs  4.09   10  0.9431
