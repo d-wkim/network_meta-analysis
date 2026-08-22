@@ -33,13 +33,10 @@ packages <- c(
 
 # install.packages(packages, dependencies = TRUE)
 
-devtools::install_github("NightingaleHealth/ggforestplot")
 lapply(packages, library, character.only = TRUE)
 ```
 
 ```{r}
-
-# Custom R function for running network meta-analysis
 
 network_meta_analysis <- function(df, sm = "") {
   
@@ -73,50 +70,27 @@ network_meta_analysis <- function(df, sm = "") {
 	labels = m.netmeta$trts
 	long.labels = c("Bone-patellar tendon-bone", "Hamstring", "Peroneus longus", "Quadriceps", "Tibialis anterior")
 
-	svg = paste0("G:/My Drive/github/d-wkim/network_meta-analysis/3_meta-analysis/R/analysis/plots/netgraph/", df, ".svg")
+	svg = paste0("G:/My Drive/github/d-wkim/network_meta-analysis/4_manuscript/network_meta-analysis/tables_and_figures/figures/fig_3/", df, ".svg")
 	svg(file = svg, height = 5, width = 5)
 
-	network_graph = netgraph(m.netmeta, labels = labels, dim = "2d", scale = 1.1)
+	network_graph <- netgraph(m.netmeta, labels = long.labels, dim = "2d", scale = 1.1)
 	print(network_graph)
 	dev.off()
 	
   assign(paste0(df), m.netmeta, envir = .GlobalEnv) # Assign the outcome names as variables of the results
   
-arms <- list(c("BPTB", "HT"),
-             c("BPTB", "QT"),
-             c("BPTB", "PLT"),
-             c("BPTB", "AT"),
-             c("BPTB", "TA"),
-             c("HT", "QT"),
-             c("HT", "PLT"),
-             c("HT", "AT"),
-             c("HT", "TA"),
-             c("QT", "PLT"),
-             c("QT", "AT"),
-             c("QT", "TA"),
-             c("PLT", "AT"),
-             c("PLT", "TA"),
-             c("AT", "TA")
+  header <- c("SMD", "ci.lb", "ci.ub")
+  ES <- m.netmeta$TE.nma.random
+  ci.lb <- m.netmeta$lower.nma.random
+  ci.ub <- m.netmeta$upper.nma.random
+  
+  dat <- rbind(header,
+              ES,
+              ci.lb,
+              ci.ub
   )
   
-  if (!is.na(m.netmeta$TE.random[x[1], x[2]])) {
-        c(
-      m.netmeta$TE.random[x[1], x[2]],
-      m.netmeta$lower.random[x[1], x[2]],
-      m.netmeta$upper.random[x[1], x[2]]
-    )
-    
-  } else {
-    
-    NULL
-    
-  }
-
-  
-  
-  
-  return(m.netmeta)	
-
+  write.csv(dat, file = paste0("G:/My Drive/github/d-wkim/network_meta-analysis/4_manuscript/network_meta-analysis/tables_and_figures/supplementary_tables/",df,".csv"))
 }
 
 ```
@@ -135,11 +109,9 @@ lapply(dichotomous, sm = "OR", network_meta_analysis)
 ```{r}
 
 m.netmeta <- ikdc_subjective 
-
 results <- function(df) {
   
   m.netmeta <- df
-  
   BPTB_HT <- c(m.netmeta$TE.random["BPTB", "HT"], m.netmeta$lower.random["BPTB", "HT"], m.netmeta$upper.random["BPTB", "HT"])
   BPTB_QT <- c(m.netmeta$TE.random["BPTB", "QT"], m.netmeta$lower.random["BPTB", "QT"], m.netmeta$upper.random["BPTB", "QT"])
   BPTB_PLT <- c(m.netmeta$TE.random["BPTB", "PLT"], m.netmeta$lower.random["BPTB", "PLT"], m.netmeta$upper.random["BPTB", "PLT"])
@@ -181,7 +153,6 @@ results <- function(df) {
                AT_TA
                )
   
-  
   csv_path <- paste0("./",df,".csv")
     
   write.csv(dat, file = csv_path)
@@ -202,7 +173,7 @@ m.netmeta <- ikdc_subjective
 
 header <- c("Effect size", "ci.lb", "ci.ub")
 dat <- data.frame(
-  id <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+  id <- 1:15
 )
 
 dat <- rbind(header, 
